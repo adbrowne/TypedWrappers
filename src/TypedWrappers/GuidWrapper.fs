@@ -14,20 +14,31 @@ type public GuidWrapper() as this =
     let thisAssembly = Assembly.GetExecutingAssembly()
     let rootNamespace = "TypedWrappers"
     let baseTy = typeof<obj>
-    let staticParams = [ProvidedStaticParameter("ignored", typeof<string>)]
+    let staticParams = [ProvidedStaticParameter("UniqueTypeIdentity", typeof<string>)]
     let guidTy = ProvidedTypeDefinition(thisAssembly, rootNamespace, "GuidWrapper", Some baseTy)
 
+    let currentTypeIndex = ref -1
     do guidTy.DefineStaticParameters(
         staticParameters=staticParams, 
-        apply=(fun typeName parameters ->
-        let t = ProvidedTypeDefinition(thisAssembly, rootNamespace, typeName, Some baseTy)
+        apply=(fun typeName parameterValues ->
+        
+        match parameterValues with 
+        | [| :? string as typeIdString|] -> 
+            let (parsed,typeId) = Guid.TryParse(typeIdString)
 
-        let ctor = 
-              ProvidedConstructor(parameters = [ ProvidedParameter("guid",typeof<Guid>) ], 
-                            InvokeCode= (fun args -> <@@ (%%(args.[0]) : Guid) :> obj @@>))
-        t.AddMember ctor
+            if not parsed then
+                failwith "UniqueTypeIdentity must be a guid: %a" typeIdString
+               
+            let typeIndex = System.Threading.Interlocked.Increment currentTypeIndex
+            let t = ProvidedTypeDefinition(thisAssembly, rootNamespace, typeName, Some baseTy)
 
-        t))
+            let ctor = 
+                  ProvidedConstructor(parameters = [ ProvidedParameter("guid",typeof<Guid>) ], 
+                                InvokeCode= (fun args -> <@@ ((typeIndex, %%(args.[0])) : (int * Guid)) :> obj @@>))
+            t.AddMember ctor
+
+            t
+        | _ -> failwith "unexpected parameter values")) 
 
     do this.AddNamespace(rootNamespace, [guidTy])
 
