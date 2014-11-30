@@ -3,7 +3,7 @@ open System.Reflection
 
 [<assembly: AssemblyTitleAttribute("TypedWrappers")>]
 [<assembly: AssemblyProductAttribute("TypedWrappers")>]
-[<assembly: AssemblyDescriptionAttribute("Type Provider to create types that wrap prim")>]
+[<assembly: AssemblyDescriptionAttribute("Primitive type wrappers")>]
 [<assembly: AssemblyVersionAttribute("1.0")>]
 [<assembly: AssemblyFileVersionAttribute("1.0")>]
 do ()
