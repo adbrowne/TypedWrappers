@@ -123,11 +123,10 @@ Target "Build" (fun _ ->
 
 Target "RunTests" (fun _ ->
     !! testAssemblies
-    |> NUnit (fun p ->
+    |> xUnit (fun p ->
         { p with
-            DisableShadowCopy = true
-            TimeOut = TimeSpan.FromMinutes 20.
-            OutputFile = "TestResults.xml" })
+            NUnitXmlOutput = true
+            TimeOut = TimeSpan.FromMinutes 20. })
 )
 
 #if MONO

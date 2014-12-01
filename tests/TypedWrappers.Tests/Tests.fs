@@ -1,23 +1,23 @@
 module TypedWrappers.Tests
 
 open TypedWrappers
-open NUnit.Framework
+open Xunit
 open Samples.FSharp.RegexTypeProvider
 
-[<Test>]
+[<Fact>]
 let ``hello returns 42`` () =
   let result = Library.hello 42
   printfn "%i" result
-  Assert.AreEqual(42,result)
+  Assert.Equal(42,result)
 
-[<Test>]
+[<Fact>]
 let ``can use type provider type`` () =
   let foo = new Samples.HelloWorldTypeProvider.Type1()
   printfn "%s" Samples.HelloWorldTypeProvider.Type1.StaticProperty
 
 type T = Samples.FSharp.RegexTypeProvider.RegexTyped< @"(?<AreaCode>^\d{3})-(?<PhoneNumber>\d{3}-\d{4}$)">
     
-[<Test>]
+[<Fact>]
 let ``regex type provider`` () =
     let reg = T()
     let result = T.IsMatch("425-555-2345")
